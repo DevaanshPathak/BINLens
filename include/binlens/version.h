@@ -1,0 +1,6 @@
+#ifndef BINLENS_VERSION_H
+#define BINLENS_VERSION_H
+
+#define BINLENS_VERSION "0.1.0"
+
+#endif

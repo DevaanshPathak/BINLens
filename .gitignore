@@ -1,3 +1,11 @@
+# BINLens build outputs
+/binlens
+/binlens.exe
+/build/
+/dist/
+ROADMAP.md
+/devlogs/
+
 # Prerequisites
 *.d
 
