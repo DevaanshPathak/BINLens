@@ -1,0 +1,2 @@
+# BINLens
+A command-line firmware inspector written in C. It parses Intel HEX (.hex)  and raw binary (.bin) firmware images, reconstructs the memory layout, and  reports per-region statistics including size, address ranges, gaps/overlaps,  and Shannon entropy — useful for spotting packed, encrypted, or padding  regions in embedded firmware. Target platform is ARM Cortex-M firmware  (STM32-class), so vector table detection (initial stack pointer + reset  handler at 0x00000000/0x08000000) should be a first-class feature, not an  afterthought.
