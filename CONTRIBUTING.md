@@ -39,6 +39,8 @@ The test workflow should stay Makefile-based:
 make test
 ```
 
+See [TESTING.md](TESTING.md) for the current fixture set and manual validation commands.
+
 Tests should cover:
 
 - Valid Intel HEX files.

@@ -6,6 +6,31 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int ascii_lower(int ch)
+{
+    if (ch >= 'A' && ch <= 'Z') {
+        return ch - 'A' + 'a';
+    }
+    return ch;
+}
+
+static int equals_ignore_case(const char *left, const char *right)
+{
+    if (left == NULL || right == NULL) {
+        return 0;
+    }
+
+    while (*left != '\0' && *right != '\0') {
+        if (ascii_lower((unsigned char)*left) != ascii_lower((unsigned char)*right)) {
+            return 0;
+        }
+        left++;
+        right++;
+    }
+
+    return *left == '\0' && *right == '\0';
+}
+
 /* Parses an integer string into a uint64_t value. */
 static int parse_u64(const char *text, uint64_t *value)
 {
@@ -43,15 +68,15 @@ static int parse_size(const char *text, size_t *value)
 /* Converts a format string into a BlInputFormat value. */
 static int parse_format(const char *text, BlInputFormat *format)
 {
-    if (strcmp(text, "auto") == 0) {
+    if (equals_ignore_case(text, "auto")) {
         *format = BL_FORMAT_AUTO;
         return 0;
     }
-    if (strcmp(text, "hex") == 0 || strcmp(text, "ihex") == 0) {
+    if (equals_ignore_case(text, "hex") || equals_ignore_case(text, "ihex")) {
         *format = BL_FORMAT_INTEL_HEX;
         return 0;
     }
-    if (strcmp(text, "bin") == 0 || strcmp(text, "raw") == 0) {
+    if (equals_ignore_case(text, "bin") || equals_ignore_case(text, "raw")) {
         *format = BL_FORMAT_RAW_BIN;
         return 0;
     }
@@ -134,7 +159,10 @@ int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *dia
             bl_diag_set(diag, BL_DIAG_ERROR, "only one input file is supported");
             return -1;
         } else {
-            /* Store the positional input file path safely. */
+            if (strlen(arg) >= sizeof(options->input_path)) {
+                bl_diag_set(diag, BL_DIAG_ERROR, "input path is too long");
+                return -1;
+            }
             strncpy(options->input_path, arg, sizeof(options->input_path) - 1);
             options->input_path[sizeof(options->input_path) - 1] = '\0';
         }
@@ -156,11 +184,11 @@ void bl_cli_print_help(FILE *stream, const char *program_name)
             "\n"
             "Options:\n"
             "  --format auto|hex|bin       Input format, default: auto\n"
-            "  --base <address>            Base address for raw .bin input\n"
+            "  --base <address>            Base address for raw .bin input, default: 0\n"
             "  --entropy-chunk <bytes>     Entropy window size, default: 1024\n"
             "  --heatmap                   Show ASCII entropy heatmap\n"
             "  --no-color                  Disable colored output\n"
-            "  -v, --verbose               Show detailed diagnostics\n"
+            "  -v, --verbose               Show source chunks and entropy windows\n"
             "  -h, --help                  Show this help\n"
             "  --version                   Show version\n",
             program_name);

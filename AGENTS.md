@@ -12,4 +12,5 @@ Guidance for automated agents working in this repository.
 - Do not write implementation code when the user asks for planning or documentation artifacts only.
 - Write devlogs only when the user explicitly asks for a devlog.
 - Store devlogs in `devlogs/` as numbered Markdown files using the next integer filename, such as `1.md`, `2.md`, `3.md`.
+- Keep each devlog under 4,000 characters.
 - Keep the project C11, POSIX-compatible, Makefile-based, and dependency-free unless the user changes those constraints.

@@ -63,7 +63,6 @@ MemRegion
   length
   bytes
   entropy
-  notes
 ```
 
 A memory region represents contiguous populated memory after sorting and merging source chunks. Gaps are not inserted as synthetic zero bytes in v1 because that would distort entropy results.
@@ -116,8 +115,9 @@ VectorTableCandidate
   reset_handler_address
   stack_pointer_validity
   reset_handler_validity
+  reset_handler_in_region
+  score
   confidence
-  notes
 ```
 
 The reset handler is stored both raw and with the Thumb bit cleared so the report can show exactly what was encoded in the firmware image.
@@ -145,3 +145,4 @@ input file
 - Do not fill gaps by default; missing bytes and zero bytes are different facts.
 - Keep terminal output deterministic by sorting all address-based collections before formatting.
 - Make parser and analysis modules independent from terminal formatting so tests can assert structured results.
+- Keep entropy and vector-table scoring deterministic so CLI output is stable across platforms.

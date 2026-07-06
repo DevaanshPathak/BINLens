@@ -160,6 +160,10 @@ Design decision: plain text is the default because the v1 audience is a develope
 - Portability: avoid compiler-specific extensions in v1.
 - Testability: parser, memory map, entropy, and vector table detection should be separately testable.
 
+## v1 Status
+
+The v1 MVP implements the parser, raw binary loader, memory reconstruction, entropy analysis, heatmap output, and Cortex-M vector table detector described in this document. Stretch features such as JSON output, opcode-density heuristics, section guessing, and comparison mode remain out of scope.
+
 ## Success Criteria for v1
 
 - Correctly parses valid Intel HEX files using record types `00`, `01`, `02`, `04`, and `05`.
@@ -170,5 +174,5 @@ Design decision: plain text is the default because the v1 audience is a develope
 - Detects a valid STM32-style vector table at `0x08000000`.
 - Provides useful diagnostics for missing or suspicious vector tables.
 - Builds with `make` on Linux and macOS using a C11 compiler.
-- Includes a small test corpus covering valid, malformed, sparse, overlapping, and high-entropy inputs.
+- Includes a small test corpus covering valid, malformed, sparse, overlapping, entropy, and STM32-like inputs.
 - README usage examples match the implemented CLI behavior.
