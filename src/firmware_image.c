@@ -24,7 +24,8 @@ void bl_firmware_image_free(BlFirmwareImage *image)
         return;
     }
 
-    bl_firmware_image_clear_layout(image); /* Clear derived layout first because regions own seperate byte buffers. */
+    bl_firmware_image_clear_layout(
+        image); /* Clear derived layout first because regions own seperate byte buffers. */
 
     for (i = 0; i < image->chunk_count; i++) {
         free(image->chunks[i].bytes);
@@ -62,7 +63,8 @@ void bl_firmware_image_clear_layout(BlFirmwareImage *image)
 }
 
 /* Stores a bounded, null-terminated copy of the source file path. */
-void bl_firmware_image_set_source(BlFirmwareImage *image, const char *source_path)
+void bl_firmware_image_set_source(BlFirmwareImage *image,
+                                  const char *source_path)
 {
     if (image == NULL || source_path == NULL) {
         return;
@@ -94,17 +96,29 @@ int bl_firmware_image_add_chunk(BlFirmwareImage *image,
         return 0;
     }
 
-    if ((uint64_t)(length - 1) > UINT64_MAX - start_address) { /* Reject chunks whose inclusive end address would overflow uint64_t. */
-        bl_diag_set(diag, BL_DIAG_ERROR, "address range overflows 64-bit address space");
+    if ((uint64_t)(length - 1) >
+        UINT64_MAX -
+            start_address) { /* Reject chunks whose inclusive end address would overflow uint64_t. */
+        bl_diag_set(diag,
+                    BL_DIAG_ERROR,
+                    "address range overflows 64-bit address space");
         return -1;
     }
-    if (length > SIZE_MAX - image->total_loaded_bytes) { /* Keep total_loaded_bytes from wrapping when accumulating raw chunk sizes. */
-        bl_diag_set(diag, BL_DIAG_ERROR, "loaded byte count overflows size limit");
+    if (length >
+        SIZE_MAX -
+            image
+                ->total_loaded_bytes) { /* Keep total_loaded_bytes from wrapping when accumulating raw chunk sizes. */
+        bl_diag_set(diag,
+                    BL_DIAG_ERROR,
+                    "loaded byte count overflows size limit");
         return -1;
     }
 
-    if (image->chunk_count == image->chunk_capacity) { /* Grow the chunk table geometrically to keep repeated appends efficient. */
-        size_t next_capacity = image->chunk_capacity == 0 ? 8 : image->chunk_capacity * 2;
+    if (image->chunk_count ==
+        image
+            ->chunk_capacity) { /* Grow the chunk table geometrically to keep repeated appends efficient. */
+        size_t next_capacity =
+            image->chunk_capacity == 0 ? 8 : image->chunk_capacity * 2;
         BlSourceChunk *next_chunks;
 
         if (next_capacity < image->chunk_capacity) {
@@ -112,10 +126,13 @@ int bl_firmware_image_add_chunk(BlFirmwareImage *image,
             return -1;
         }
 
-        next_chunks = (BlSourceChunk *)realloc(image->chunks,
-                                               next_capacity * sizeof(*next_chunks));
+        next_chunks =
+            (BlSourceChunk *)realloc(image->chunks,
+                                     next_capacity * sizeof(*next_chunks));
         if (next_chunks == NULL) {
-            bl_diag_set(diag, BL_DIAG_ERROR, "out of memory while growing chunk table");
+            bl_diag_set(diag,
+                        BL_DIAG_ERROR,
+                        "out of memory while growing chunk table");
             return -1;
         }
 
@@ -123,14 +140,19 @@ int bl_firmware_image_add_chunk(BlFirmwareImage *image,
         image->chunk_capacity = next_capacity;
     }
 
-    copy = (unsigned char *)malloc(length); /* Copy bytes before storing the chunk so callers may free their input buffer safely. */
+    copy = (unsigned char *)malloc(
+        length); /* Copy bytes before storing the chunk so callers may free their input buffer safely. */
     if (copy == NULL) {
-        bl_diag_set(diag, BL_DIAG_ERROR, "out of memory while copying firmware bytes");
+        bl_diag_set(diag,
+                    BL_DIAG_ERROR,
+                    "out of memory while copying firmware bytes");
         return -1;
     }
     memcpy(copy, bytes, length);
 
-    end_address = start_address + (uint64_t)length - 1u; /* Chunk address ranges are inclusive, so end is start plus length minus one. */
+    end_address =
+        start_address + (uint64_t)length -
+        1u; /* Chunk address ranges are inclusive, so end is start plus length minus one. */
     chunk = &image->chunks[image->chunk_count++];
     chunk->start_address = start_address;
     chunk->end_address = end_address;
@@ -139,11 +161,14 @@ int bl_firmware_image_add_chunk(BlFirmwareImage *image,
     chunk->origin_line = origin_line;
     chunk->origin_path[0] = '\0';
     if (origin_path != NULL) {
-        strncpy(chunk->origin_path, origin_path, sizeof(chunk->origin_path) - 1);
+        strncpy(chunk->origin_path,
+                origin_path,
+                sizeof(chunk->origin_path) - 1);
         chunk->origin_path[sizeof(chunk->origin_path) - 1] = '\0';
     }
 
-    if (image->total_loaded_bytes == 0) { /* Maintain the overall loaded address bounds across all chunks. */
+    if (image->total_loaded_bytes ==
+        0) { /* Maintain the overall loaded address bounds across all chunks. */
         image->address_start = start_address;
         image->address_end = end_address;
     } else {

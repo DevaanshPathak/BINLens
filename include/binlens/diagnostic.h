@@ -17,7 +17,6 @@ typedef enum BlDiagnosticSeverity {
     BL_DIAG_ERROR
 } BlDiagnosticSeverity;
 
-
 /**
 * Stores diagnostic information for an operation.
 *
@@ -29,7 +28,7 @@ typedef enum BlDiagnosticSeverity {
 typedef struct BlDiagnostic {
     /** Severity level of the current diagnostic message. */
     BlDiagnosticSeverity severity;
-    
+
     /** Human-readable diagnostic message. */
     char message[512];
 } BlDiagnostic;

@@ -16,7 +16,10 @@ static void test_minimal_hex(void)
     const BlSourceChunk *chunk;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/minimal.ihex", &image, &stats, &diag) == 0);
+    assert(bl_hex_parse_file("tests/fixtures/minimal.ihex",
+                             &image,
+                             &stats,
+                             &diag) == 0);
 
     assert(stats.line_count == 2);
     assert(stats.record_count == 2);
@@ -52,7 +55,10 @@ static void test_extended_linear_and_start_address(void)
     const BlSourceChunk *chunk;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/extended_linear.ihex", &image, &stats, &diag) == 0);
+    assert(bl_hex_parse_file("tests/fixtures/extended_linear.ihex",
+                             &image,
+                             &stats,
+                             &diag) == 0);
 
     assert(stats.record_count == 4);
     assert(stats.data_record_count == 1);
@@ -79,7 +85,10 @@ static void test_extended_segment_address(void)
     const BlSourceChunk *chunk;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/extended_segment.ihex", &image, &stats, &diag) == 0);
+    assert(bl_hex_parse_file("tests/fixtures/extended_segment.ihex",
+                             &image,
+                             &stats,
+                             &diag) == 0);
 
     chunk = bl_firmware_image_chunk_at(&image, 0);
     assert(chunk != NULL);
@@ -99,7 +108,10 @@ static void test_checksum_failure_reports_line(void)
     BlDiagnostic diag;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/bad_checksum.ihex", &image, &stats, &diag) != 0);
+    assert(bl_hex_parse_file("tests/fixtures/bad_checksum.ihex",
+                             &image,
+                             &stats,
+                             &diag) != 0);
     assert(diag.severity == BL_DIAG_ERROR);
     assert(strstr(diag.message, "line 1") != NULL);
     assert(strstr(diag.message, "checksum") != NULL);
@@ -116,7 +128,10 @@ static void test_record_after_eof_fails(void)
     BlDiagnostic diag;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/after_eof.ihex", &image, &stats, &diag) != 0);
+    assert(bl_hex_parse_file("tests/fixtures/after_eof.ihex",
+                             &image,
+                             &stats,
+                             &diag) != 0);
     assert(diag.severity == BL_DIAG_ERROR);
     assert(strstr(diag.message, "after EOF") != NULL);
 

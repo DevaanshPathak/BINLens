@@ -21,7 +21,8 @@ static int equals_ignore_case(const char *left, const char *right)
     }
 
     while (*left != '\0' && *right != '\0') {
-        if (ascii_lower((unsigned char)*left) != ascii_lower((unsigned char)*right)) {
+        if (ascii_lower((unsigned char)*left) !=
+            ascii_lower((unsigned char)*right)) {
             return 0;
         }
         left++;
@@ -56,14 +57,14 @@ static int parse_size(const char *text, size_t *value)
 {
     uint64_t parsed;
 
-    if (parse_u64(text, &parsed) != 0 || parsed == 0 || parsed > (uint64_t)SIZE_MAX) {
+    if (parse_u64(text, &parsed) != 0 || parsed == 0 ||
+        parsed > (uint64_t)SIZE_MAX) {
         return -1;
     }
 
     *value = (size_t)parsed;
     return 0;
 }
-
 
 /* Converts a format string into a BlInputFormat value. */
 static int parse_format(const char *text, BlInputFormat *format)
@@ -102,7 +103,10 @@ void bl_cli_options_init(BlCliOptions *options)
 }
 
 /* Parses command-line arguments into BlCliOptions. */
-int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *diag)
+int bl_cli_parse(int argc,
+                 char **argv,
+                 BlCliOptions *options,
+                 BlDiagnostic *diag)
 {
     int i;
 
@@ -124,39 +128,55 @@ int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *dia
             options->verbose = true;
         } else if (strcmp(arg, "--format") == 0) {
             if (++i >= argc || parse_format(argv[i], &options->format) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected format: auto, hex, or bin");
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected format: auto, hex, or bin");
                 return -1;
             }
         } else if (strncmp(arg, "--format=", 9) == 0) {
             if (parse_format(arg + 9, &options->format) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected format: auto, hex, or bin");
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected format: auto, hex, or bin");
                 return -1;
             }
         } else if (strcmp(arg, "--base") == 0) {
-            if (++i >= argc || parse_u64(argv[i], &options->base_address) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected numeric base address");
+            if (++i >= argc ||
+                parse_u64(argv[i], &options->base_address) != 0) {
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected numeric base address");
                 return -1;
             }
         } else if (strncmp(arg, "--base=", 7) == 0) {
             if (parse_u64(arg + 7, &options->base_address) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected numeric base address");
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected numeric base address");
                 return -1;
             }
         } else if (strcmp(arg, "--entropy-chunk") == 0) {
-            if (++i >= argc || parse_size(argv[i], &options->entropy_chunk) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected positive entropy chunk size");
+            if (++i >= argc ||
+                parse_size(argv[i], &options->entropy_chunk) != 0) {
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected positive entropy chunk size");
                 return -1;
             }
         } else if (strncmp(arg, "--entropy-chunk=", 16) == 0) {
             if (parse_size(arg + 16, &options->entropy_chunk) != 0) {
-                bl_diag_set(diag, BL_DIAG_ERROR, "expected positive entropy chunk size");
+                bl_diag_set(diag,
+                            BL_DIAG_ERROR,
+                            "expected positive entropy chunk size");
                 return -1;
             }
         } else if (arg[0] == '-') {
             bl_diag_set(diag, BL_DIAG_ERROR, "unknown option: %s", arg);
             return -1;
         } else if (options->input_path[0] != '\0') {
-            bl_diag_set(diag, BL_DIAG_ERROR, "only one input file is supported");
+            bl_diag_set(diag,
+                        BL_DIAG_ERROR,
+                        "only one input file is supported");
             return -1;
         } else {
             if (strlen(arg) >= sizeof(options->input_path)) {
@@ -168,7 +188,8 @@ int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *dia
         }
     }
 
-    if (!options->show_help && !options->show_version && options->input_path[0] == '\0') {
+    if (!options->show_help && !options->show_version &&
+        options->input_path[0] == '\0') {
         bl_diag_set(diag, BL_DIAG_ERROR, "missing input file");
         return -1;
     }
@@ -179,17 +200,19 @@ int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *dia
 /* Prints command-line usage information. */
 void bl_cli_print_help(FILE *stream, const char *program_name)
 {
-    fprintf(stream,
-            "Usage: %s [options] <firmware.hex|firmware.bin>\n"
-            "\n"
-            "Options:\n"
-            "  --format auto|hex|bin       Input format, default: auto\n"
-            "  --base <address>            Base address for raw .bin input, default: 0\n"
-            "  --entropy-chunk <bytes>     Entropy window size, default: 1024\n"
-            "  --heatmap                   Show ASCII entropy heatmap\n"
-            "  --no-color                  Disable colored output\n"
-            "  -v, --verbose               Show source chunks and entropy windows\n"
-            "  -h, --help                  Show this help\n"
-            "  --version                   Show version\n",
-            program_name);
+    fprintf(
+        stream,
+        "Usage: %s [options] <firmware.hex|firmware.bin>\n"
+        "\n"
+        "Options:\n"
+        "  --format auto|hex|bin       Input format, default: auto\n"
+        "  --base <address>            Base address for raw .bin input, "
+        "default: 0\n"
+        "  --entropy-chunk <bytes>     Entropy window size, default: 1024\n"
+        "  --heatmap                   Show ASCII entropy heatmap\n"
+        "  --no-color                  Disable colored output\n"
+        "  -v, --verbose               Show source chunks and entropy windows\n"
+        "  -h, --help                  Show this help\n"
+        "  --version                   Show version\n",
+        program_name);
 }

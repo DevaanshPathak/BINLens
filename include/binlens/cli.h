@@ -77,7 +77,10 @@ void bl_cli_options_init(BlCliOptions *options);
  *
  * @return 0 on success, or a non-zero value on failure.
  */
-int bl_cli_parse(int argc, char **argv, BlCliOptions *options, BlDiagnostic *diag);
+int bl_cli_parse(int argc,
+                 char **argv,
+                 BlCliOptions *options,
+                 BlDiagnostic *diag);
 
 /**
  * Prints CLI usage and help information.

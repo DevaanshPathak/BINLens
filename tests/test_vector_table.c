@@ -14,15 +14,19 @@ static void add_chunk(BlFirmwareImage *image,
 {
     BlDiagnostic diag;
 
-    assert(bl_firmware_image_add_chunk(image, start, bytes, length, "test", 1, &diag) == 0);
+    assert(bl_firmware_image_add_chunk(image,
+                                       start,
+                                       bytes,
+                                       length,
+                                       "test",
+                                       1,
+                                       &diag) == 0);
 }
 
 static void test_high_confidence_vector_table(void)
 {
-    const unsigned char vector[] = {
-        0x00, 0x10, 0x00, 0x20,
-        0x01, 0x01, 0x00, 0x08
-    };
+    const unsigned char vector[] =
+        {0x00, 0x10, 0x00, 0x20, 0x01, 0x01, 0x00, 0x08};
     const unsigned char code[] = {0x00, 0xBF, 0x00, 0xBF};
     BlFirmwareImage image;
     BlDiagnostic diag;
@@ -72,7 +76,10 @@ static void test_stm32_like_hex_fixture(void)
     BlVectorTableCandidate candidate;
 
     bl_firmware_image_init(&image);
-    assert(bl_hex_parse_file("tests/fixtures/stm32_vector.ihex", &image, &stats, &diag) == 0);
+    assert(bl_hex_parse_file("tests/fixtures/stm32_vector.ihex",
+                             &image,
+                             &stats,
+                             &diag) == 0);
     assert(bl_memmap_reconstruct(&image, &diag) == 0);
     assert(bl_vector_table_detect(&image, &candidate) == 0);
 

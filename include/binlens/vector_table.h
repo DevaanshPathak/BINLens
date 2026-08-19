@@ -18,14 +18,18 @@ typedef enum BlVectorConfidence {
 typedef struct BlVectorTableCandidate {
     uint64_t table_address;
     uint32_t initial_stack_pointer;
-    uint32_t reset_handler_raw; /* Raw reset vector value as stored in firmware, including Thumb-state bit. */
-    uint32_t reset_handler_address; /* Normalized reset handler address with metadata bits cleared. */
+    uint32_t
+        reset_handler_raw; /* Raw reset vector value as stored in firmware, including Thumb-state bit. */
+    uint32_t
+        reset_handler_address; /* Normalized reset handler address with metadata bits cleared. */
     bool stack_pointer_valid;
     bool stack_pointer_aligned;
     bool reset_handler_valid;
     bool reset_handler_in_region;
-    bool table_address_common; /* True when the table starts at a common vector table address. */
-    unsigned int score; /* Heuristic score used to rank candidate tables before assigning confidence. */
+    bool
+        table_address_common; /* True when the table starts at a common vector table address. */
+    unsigned int
+        score; /* Heuristic score used to rank candidate tables before assigning confidence. */
     BlVectorConfidence confidence;
 } BlVectorTableCandidate;
 

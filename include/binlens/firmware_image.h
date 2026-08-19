@@ -79,9 +79,12 @@ typedef struct BlFirmwareImage {
     BlMemOverlap *overlaps;
     size_t overlap_count;
     size_t overlap_capacity;
-    size_t total_loaded_bytes; /* Raw number of bytes loaded from source chunks, including duplicate overlap bytes. */
-    uint64_t address_start; /* Lowest loaded firmware address, valid only when at least one chunk exists. */
-    uint64_t address_end; /* Highest loaded firmware address, valid only when atleast one chunk exists. */
+    size_t
+        total_loaded_bytes; /* Raw number of bytes loaded from source chunks, including duplicate overlap bytes. */
+    uint64_t
+        address_start; /* Lowest loaded firmware address, valid only when at least one chunk exists. */
+    uint64_t
+        address_end; /* Highest loaded firmware address, valid only when atleast one chunk exists. */
 } BlFirmwareImage;
 
 /* Initializes an empty firmware image. */
@@ -91,10 +94,13 @@ void bl_firmware_image_init(BlFirmwareImage *image);
 void bl_firmware_image_free(BlFirmwareImage *image);
 
 /* Clears reconstructed regions, gaps, and overlaps but preserves source chunks. */
-void bl_firmware_image_clear_layout(BlFirmwareImage *image); /* Stores the orignal source file path for the image. */
+void bl_firmware_image_clear_layout(
+    BlFirmwareImage
+        *image); /* Stores the orignal source file path for the image. */
 
 /* Stores the orignal source file path for the image. */
-void bl_firmware_image_set_source(BlFirmwareImage *image, const char *source_path);
+void bl_firmware_image_set_source(BlFirmwareImage *image,
+                                  const char *source_path);
 
 /* Adds a chunk by copying the supplied bytes into image-owned storage. */
 int bl_firmware_image_add_chunk(BlFirmwareImage *image,

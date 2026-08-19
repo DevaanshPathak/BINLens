@@ -2,8 +2,8 @@
 #include "binlens/cli.h"
 #include "binlens/diagnostic.h"
 #include "binlens/entropy.h"
-#include "binlens/format.h"
 #include "binlens/firmware_image.h"
+#include "binlens/format.h"
 #include "binlens/hex_parser.h"
 #include "binlens/memmap.h"
 #include "binlens/vector_table.h"
@@ -28,7 +28,8 @@ static int extension_equals(const char *left, const char *right)
     }
 
     while (*left != '\0' && *right != '\0') {
-        if (ascii_lower((unsigned char)*left) != ascii_lower((unsigned char)*right)) {
+        if (ascii_lower((unsigned char)*left) !=
+            ascii_lower((unsigned char)*right)) {
             return 0;
         }
         left++;
@@ -70,7 +71,8 @@ static void print_address_span(const BlFirmwareImage *image)
     printf("  Address span:  %s - %s\n", start, end);
 }
 
-static void print_input_summary(const BlFirmwareImage *image, const BlHexParseStats *hex_stats)
+static void print_input_summary(const BlFirmwareImage *image,
+                                const BlHexParseStats *hex_stats)
 {
     char size[32];
     char start_linear[32];
@@ -89,7 +91,9 @@ static void print_input_summary(const BlFirmwareImage *image, const BlHexParseSt
     print_address_span(image);
 
     if (hex_stats != NULL && hex_stats->has_start_linear_address) {
-        bl_format_address(hex_stats->start_linear_address, start_linear, sizeof(start_linear));
+        bl_format_address(hex_stats->start_linear_address,
+                          start_linear,
+                          sizeof(start_linear));
         printf("  Start linear:  %s\n", start_linear);
     }
 }
@@ -137,19 +141,25 @@ static void print_vector_table(const BlVectorTableCandidate *candidate)
 
     bl_format_address(candidate->table_address, table, sizeof(table));
     bl_format_address(candidate->initial_stack_pointer, sp, sizeof(sp));
-    bl_format_address(candidate->reset_handler_raw, reset_raw, sizeof(reset_raw));
-    bl_format_address(candidate->reset_handler_address, reset_address, sizeof(reset_address));
+    bl_format_address(candidate->reset_handler_raw,
+                      reset_raw,
+                      sizeof(reset_raw));
+    bl_format_address(candidate->reset_handler_address,
+                      reset_address,
+                      sizeof(reset_address));
 
     printf("  Candidate:     %s\n", table);
     printf("  Initial SP:    %s  %s, %s\n",
            sp,
-           candidate->stack_pointer_valid ? "valid SRAM range" : "outside common SRAM range",
+           candidate->stack_pointer_valid ? "valid SRAM range"
+                                          : "outside common SRAM range",
            candidate->stack_pointer_aligned ? "aligned" : "unaligned");
     printf("  Reset handler: %s  target %s, %s, %s\n",
            reset_raw,
            reset_address,
            candidate->reset_handler_valid ? "Thumb bit set" : "Thumb bit clear",
-           candidate->reset_handler_in_region ? "populated target" : "target not loaded");
+           candidate->reset_handler_in_region ? "populated target"
+                                              : "target not loaded");
     printf("  Confidence:    %s (score %u)\n",
            bl_vector_confidence_name(candidate->confidence),
            candidate->score);
@@ -175,7 +185,12 @@ static void print_regions(const BlFirmwareImage *image)
         bl_format_address(region->start_address, start, sizeof(start));
         bl_format_address(region->end_address, end, sizeof(end));
         bl_format_size(region->length, size, sizeof(size));
-        printf("  %-2zu %-10s  %-10s  %-8s %.2f\n", i, start, end, size, region->entropy);
+        printf("  %-2zu %-10s  %-10s  %-8s %.2f\n",
+               i,
+               start,
+               end,
+               size,
+               region->entropy);
     }
 }
 
@@ -224,7 +239,8 @@ static void print_overlaps(const BlFirmwareImage *image)
         bl_format_address(overlap->end_address, end, sizeof(end));
         bl_format_size(overlap->length, size, sizeof(size));
 
-        if (overlap->first_origin_line != 0 || overlap->second_origin_line != 0) {
+        if (overlap->first_origin_line != 0 ||
+            overlap->second_origin_line != 0) {
             printf("  %-2zu %-10s  %-10s  %-7s %-11s line %zu / line %zu\n",
                    i,
                    start,
@@ -246,7 +262,8 @@ static void print_overlaps(const BlFirmwareImage *image)
     }
 }
 
-static void print_entropy_chunks(const BlFirmwareImage *image, size_t chunk_size)
+static void print_entropy_chunks(const BlFirmwareImage *image,
+                                 size_t chunk_size)
 {
     size_t i;
 
@@ -283,7 +300,8 @@ static void print_entropy_chunks(const BlFirmwareImage *image, size_t chunk_size
     }
 }
 
-static void print_entropy_heatmap(const BlFirmwareImage *image, size_t chunk_size)
+static void print_entropy_heatmap(const BlFirmwareImage *image,
+                                  size_t chunk_size)
 {
     size_t i;
 
@@ -308,7 +326,8 @@ static void print_entropy_heatmap(const BlFirmwareImage *image, size_t chunk_siz
 
             while (offset < region->length && symbols < 32u) {
                 size_t length = min_size(chunk_size, region->length - offset);
-                double entropy = bl_entropy_shannon(region->bytes + offset, length);
+                double entropy =
+                    bl_entropy_shannon(region->bytes + offset, length);
 
                 putchar(bl_entropy_heatmap_symbol(entropy));
                 offset += length;
@@ -358,7 +377,10 @@ int main(int argc, char **argv)
     const char *program_name = argc > 0 ? argv[0] : "binlens";
 
     if (bl_cli_parse(argc, argv, &options, &diag) != 0) {
-        fprintf(stderr, "%s: %s\n", bl_diag_severity_name(diag.severity), diag.message);
+        fprintf(stderr,
+                "%s: %s\n",
+                bl_diag_severity_name(diag.severity),
+                diag.message);
         fprintf(stderr, "Try '%s --help' for usage.\n", program_name);
         return 2;
     }
@@ -380,13 +402,20 @@ int main(int argc, char **argv)
                           : options.format;
 
     if (resolved_format == BL_FORMAT_INTEL_HEX) {
-        if (bl_hex_parse_file(options.input_path, &image, &hex_stats, &diag) != 0) {
-            fprintf(stderr, "%s: %s\n", bl_diag_severity_name(diag.severity), diag.message);
+        if (bl_hex_parse_file(options.input_path, &image, &hex_stats, &diag) !=
+            0) {
+            fprintf(stderr,
+                    "%s: %s\n",
+                    bl_diag_severity_name(diag.severity),
+                    diag.message);
             bl_firmware_image_free(&image);
             return 1;
         }
         if (bl_memmap_reconstruct(&image, &diag) != 0) {
-            fprintf(stderr, "%s: %s\n", bl_diag_severity_name(diag.severity), diag.message);
+            fprintf(stderr,
+                    "%s: %s\n",
+                    bl_diag_severity_name(diag.severity),
+                    diag.message);
             bl_firmware_image_free(&image);
             return 1;
         }
@@ -397,13 +426,22 @@ int main(int argc, char **argv)
     }
 
     if (resolved_format == BL_FORMAT_RAW_BIN) {
-        if (bl_bin_load_file(options.input_path, options.base_address, &image, &diag) != 0) {
-            fprintf(stderr, "%s: %s\n", bl_diag_severity_name(diag.severity), diag.message);
+        if (bl_bin_load_file(options.input_path,
+                             options.base_address,
+                             &image,
+                             &diag) != 0) {
+            fprintf(stderr,
+                    "%s: %s\n",
+                    bl_diag_severity_name(diag.severity),
+                    diag.message);
             bl_firmware_image_free(&image);
             return 1;
         }
         if (bl_memmap_reconstruct(&image, &diag) != 0) {
-            fprintf(stderr, "%s: %s\n", bl_diag_severity_name(diag.severity), diag.message);
+            fprintf(stderr,
+                    "%s: %s\n",
+                    bl_diag_severity_name(diag.severity),
+                    diag.message);
             bl_firmware_image_free(&image);
             return 1;
         }
@@ -414,7 +452,8 @@ int main(int argc, char **argv)
     }
 
     fprintf(stderr,
-            "error: could not infer input format for '%s'; use --format hex or --format bin\n",
+            "error: could not infer input format for '%s'; use --format hex or "
+            "--format bin\n",
             options.input_path);
     bl_firmware_image_free(&image);
     return 2;

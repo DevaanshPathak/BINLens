@@ -7,7 +7,8 @@
 #include <stdio.h>
 #include <string.h>
 
-static void write_fixture(const char *path, const unsigned char *bytes, size_t length)
+static void
+write_fixture(const char *path, const unsigned char *bytes, size_t length)
 {
     FILE *file = fopen(path, "wb");
 

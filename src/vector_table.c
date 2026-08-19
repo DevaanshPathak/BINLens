@@ -19,7 +19,8 @@ static void candidate_init(BlVectorTableCandidate *candidate)
     candidate->confidence = BL_VECTOR_CONFIDENCE_NONE;
 }
 
-static int region_contains(const BlMemRegion *region, uint64_t address, size_t length)
+static int
+region_contains(const BlMemRegion *region, uint64_t address, size_t length)
 {
     uint64_t end_address;
 
@@ -31,12 +32,12 @@ static int region_contains(const BlMemRegion *region, uint64_t address, size_t l
     }
 
     end_address = address + (uint64_t)length - 1u;
-    return address >= region->start_address && end_address <= region->end_address;
+    return address >= region->start_address &&
+           end_address <= region->end_address;
 }
 
-static const BlMemRegion *find_region(const BlFirmwareImage *image,
-                                      uint64_t address,
-                                      size_t length)
+static const BlMemRegion *
+find_region(const BlFirmwareImage *image, uint64_t address, size_t length)
 {
     size_t i;
 
@@ -55,10 +56,8 @@ static const BlMemRegion *find_region(const BlFirmwareImage *image,
 
 static uint32_t read_u32_le(const unsigned char *bytes)
 {
-    return ((uint32_t)bytes[0]) |
-           ((uint32_t)bytes[1] << 8) |
-           ((uint32_t)bytes[2] << 16) |
-           ((uint32_t)bytes[3] << 24);
+    return ((uint32_t)bytes[0]) | ((uint32_t)bytes[1] << 8) |
+           ((uint32_t)bytes[2] << 16) | ((uint32_t)bytes[3] << 24);
 }
 
 static BlVectorConfidence confidence_from_score(unsigned int score)
@@ -94,14 +93,17 @@ static void score_candidate(const BlFirmwareImage *image,
 
     offset = (size_t)(table_address - table_region->start_address);
     candidate->table_address = table_address;
-    candidate->initial_stack_pointer = read_u32_le(table_region->bytes + offset);
-    candidate->reset_handler_raw = read_u32_le(table_region->bytes + offset + 4u);
+    candidate->initial_stack_pointer =
+        read_u32_le(table_region->bytes + offset);
+    candidate->reset_handler_raw =
+        read_u32_le(table_region->bytes + offset + 4u);
     candidate->reset_handler_address = candidate->reset_handler_raw & ~1u;
 
     candidate->stack_pointer_valid =
         candidate->initial_stack_pointer >= 0x20000000u &&
         candidate->initial_stack_pointer <= 0x3FFFFFFFu;
-    candidate->stack_pointer_aligned = (candidate->initial_stack_pointer & 0x3u) == 0u;
+    candidate->stack_pointer_aligned =
+        (candidate->initial_stack_pointer & 0x3u) == 0u;
     candidate->reset_handler_valid = (candidate->reset_handler_raw & 1u) != 0u;
     candidate->reset_handler_in_region =
         find_region(image, candidate->reset_handler_address, 2u) != 0;

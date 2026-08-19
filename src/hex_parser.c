@@ -90,12 +90,13 @@ int bl_hex_parse_file(const char *path,
         char cwd[256];
 
         if (getcwd(cwd, sizeof(cwd)) != NULL) {
-            bl_diag_set(diag,
-                        BL_DIAG_ERROR,
-                        "could not open Intel HEX file: %s (%s); current directory: %s",
-                        path,
-                        strerror(errno),
-                        cwd);
+            bl_diag_set(
+                diag,
+                BL_DIAG_ERROR,
+                "could not open Intel HEX file: %s (%s); current directory: %s",
+                path,
+                strerror(errno),
+                cwd);
         } else {
             bl_diag_set(diag,
                         BL_DIAG_ERROR,
@@ -168,41 +169,46 @@ int bl_hex_parse_file(const char *path,
             parse_hex_byte(line, 3u, &address_hi) != 0 ||
             parse_hex_byte(line, 5u, &address_lo) != 0 ||
             parse_hex_byte(line, 7u, &record_type) != 0) {
-            bl_diag_set(diag,
-                        BL_DIAG_ERROR,
-                        "Intel HEX record on line %zu contains invalid header hex",
-                        stats->line_count);
+            bl_diag_set(
+                diag,
+                BL_DIAG_ERROR,
+                "Intel HEX record on line %zu contains invalid header hex",
+                stats->line_count);
             goto fail;
         }
 
         expected_length = 11u + ((size_t)byte_count * 2u);
         if (length != expected_length) {
-            bl_diag_set(diag,
-                        BL_DIAG_ERROR,
-                        "Intel HEX record on line %zu has length %zu, expected %zu",
-                        stats->line_count,
-                        length,
-                        expected_length);
+            bl_diag_set(
+                diag,
+                BL_DIAG_ERROR,
+                "Intel HEX record on line %zu has length %zu, expected %zu",
+                stats->line_count,
+                length,
+                expected_length);
             goto fail;
         }
 
         sum = byte_count + address_hi + address_lo + record_type;
         for (i = 0; i < byte_count; i++) {
             if (parse_hex_byte(line, 9u + (i * 2u), &data[i]) != 0) {
-                bl_diag_set(diag,
-                            BL_DIAG_ERROR,
-                            "Intel HEX record on line %zu contains invalid data hex",
-                            stats->line_count);
+                bl_diag_set(
+                    diag,
+                    BL_DIAG_ERROR,
+                    "Intel HEX record on line %zu contains invalid data hex",
+                    stats->line_count);
                 goto fail;
             }
             sum += data[i];
         }
 
-        if (parse_hex_byte(line, 9u + ((size_t)byte_count * 2u), &checksum) != 0) {
-            bl_diag_set(diag,
-                        BL_DIAG_ERROR,
-                        "Intel HEX record on line %zu contains invalid checksum hex",
-                        stats->line_count);
+        if (parse_hex_byte(line, 9u + ((size_t)byte_count * 2u), &checksum) !=
+            0) {
+            bl_diag_set(
+                diag,
+                BL_DIAG_ERROR,
+                "Intel HEX record on line %zu contains invalid checksum hex",
+                stats->line_count);
             goto fail;
         }
 
@@ -210,7 +216,8 @@ int bl_hex_parse_file(const char *path,
         if (checksum != computed_checksum) {
             bl_diag_set(diag,
                         BL_DIAG_ERROR,
-                        "Intel HEX checksum mismatch on line %zu: record has 0x%02X, computed 0x%02X",
+                        "Intel HEX checksum mismatch on line %zu: record has "
+                        "0x%02X, computed 0x%02X",
                         stats->line_count,
                         checksum,
                         computed_checksum);
@@ -239,7 +246,8 @@ int bl_hex_parse_file(const char *path,
             if (byte_count != 0 || offset_address != 0) {
                 bl_diag_set(diag,
                             BL_DIAG_ERROR,
-                            "Intel HEX EOF record on line %zu must have zero length and address",
+                            "Intel HEX EOF record on line %zu must have zero "
+                            "length and address",
                             stats->line_count);
                 goto fail;
             }
@@ -250,7 +258,8 @@ int bl_hex_parse_file(const char *path,
             if (byte_count != 2 || offset_address != 0) {
                 bl_diag_set(diag,
                             BL_DIAG_ERROR,
-                            "Intel HEX extended segment address record on line %zu must contain two bytes at address 0",
+                            "Intel HEX extended segment address record on line "
+                            "%zu must contain two bytes at address 0",
                             stats->line_count);
                 goto fail;
             }
@@ -261,7 +270,8 @@ int bl_hex_parse_file(const char *path,
             if (byte_count != 2 || offset_address != 0) {
                 bl_diag_set(diag,
                             BL_DIAG_ERROR,
-                            "Intel HEX extended linear address record on line %zu must contain two bytes at address 0",
+                            "Intel HEX extended linear address record on line "
+                            "%zu must contain two bytes at address 0",
                             stats->line_count);
                 goto fail;
             }
@@ -272,15 +282,15 @@ int bl_hex_parse_file(const char *path,
             if (byte_count != 4 || offset_address != 0) {
                 bl_diag_set(diag,
                             BL_DIAG_ERROR,
-                            "Intel HEX start linear address record on line %zu must contain four bytes at address 0",
+                            "Intel HEX start linear address record on line %zu "
+                            "must contain four bytes at address 0",
                             stats->line_count);
                 goto fail;
             }
             stats->has_start_linear_address = true;
-            stats->start_linear_address = ((uint32_t)data[0] << 24) |
-                                          ((uint32_t)data[1] << 16) |
-                                          ((uint32_t)data[2] << 8) |
-                                          (uint32_t)data[3];
+            stats->start_linear_address =
+                ((uint32_t)data[0] << 24) | ((uint32_t)data[1] << 16) |
+                ((uint32_t)data[2] << 8) | (uint32_t)data[3];
             break;
 
         default:
@@ -294,12 +304,17 @@ int bl_hex_parse_file(const char *path,
     }
 
     if (ferror(file)) {
-        bl_diag_set(diag, BL_DIAG_ERROR, "error while reading Intel HEX file: %s", path);
+        bl_diag_set(diag,
+                    BL_DIAG_ERROR,
+                    "error while reading Intel HEX file: %s",
+                    path);
         goto fail;
     }
 
     if (!stats->saw_eof) {
-        bl_diag_set(diag, BL_DIAG_ERROR, "Intel HEX file is missing EOF record");
+        bl_diag_set(diag,
+                    BL_DIAG_ERROR,
+                    "Intel HEX file is missing EOF record");
         goto fail;
     }
 

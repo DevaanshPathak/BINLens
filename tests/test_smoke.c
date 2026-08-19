@@ -21,7 +21,8 @@ static void test_cli_help(void)
 /* Verifies CLI parsing for raw binary format and base address. */
 static void test_cli_base_and_format(void)
 {
-    char *argv[] = {"binlens", "--format", "bin", "--base", "0x08000000", "app.bin"};
+    char *argv[] =
+        {"binlens", "--format", "bin", "--base", "0x08000000", "app.bin"};
     BlCliOptions options;
     BlDiagnostic diag;
 
