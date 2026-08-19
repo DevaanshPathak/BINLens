@@ -18,7 +18,9 @@ OBJS := $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 TEST_SRCS := $(sort $(wildcard $(TEST_DIR)/*.c))
 TEST_BINS := $(patsubst $(TEST_DIR)/%.c,$(BUILD_DIR)/%,$(TEST_SRCS))
 
-.PHONY: all test clean install uninstall
+FMT_FILES := $(sort $(wildcard $(SRC_DIR)/*.c) $(wildcard $(INC_DIR)/binlens/*.h) $(wildcard $(TEST_DIR)/*.c))
+
+.PHONY: all test clean install uninstall fmt fmt-check
 
 all: $(TARGET)
 
@@ -35,6 +37,12 @@ $(BUILD_DIR)/%: $(TEST_DIR)/%.c $(filter-out $(BUILD_DIR)/main.o,$(OBJS))
 
 test: $(TEST_BINS)
 	@set -e; for test_bin in $(TEST_BINS); do $$test_bin; done
+
+fmt:
+	clang-format -i $(FMT_FILES)
+
+fmt-check:
+	clang-format --dry-run --Werror $(FMT_FILES)
 
 install: $(TARGET)
 	install -d $(DESTDIR)$(BINDIR)
