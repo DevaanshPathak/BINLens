@@ -8,7 +8,9 @@ make test
 make
 ```
 
-The test suite is plain C and does not require external test frameworks.
+The test suite is plain C and does not require external test frameworks. The `test` target stops at the first failing binary.
+
+CI additionally enforces formatting (`make fmt-check`, pinned `clang-format`) and runs a `cppcheck` static-analysis pass over `src/`; see `.github/workflows/ci.yml`.
 
 ## Test Programs
 

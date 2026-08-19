@@ -8,6 +8,7 @@ BINLens is initially a solo project, but issues, bug reports, test cases, and fo
 - Keep the project portable across POSIX-compatible Linux and macOS systems.
 - Use only the standard C library for v1.
 - Prefer small modules with clear ownership over broad utility files.
+- Format changes with `make fmt` and verify with `make fmt-check`; the checked-in `.clang-format` is enforced by CI.
 - Use `snake_case` for functions and variables.
 - Use `UpperCamelCase` only for type names if the codebase adopts typedef-style names.
 - Keep error handling explicit and return actionable diagnostics.

@@ -99,12 +99,21 @@ Entropy Heatmap, chunk=8 bytes
   0x08000100  :
 ```
 
+## Requirements
+
+- A C11 compiler: GCC or Clang (developed with GCC 16 via MSYS2 on Windows; CI builds with GCC on `ubuntu-latest`).
+- GNU Make 4 or later.
+- No third-party libraries: BINLens builds against the C standard library only, so a fresh machine with just the tools above can run `make && make test`.
+- Optional: `clang-format` for `make fmt` / `make fmt-check` (CI pins the `clang-format==22.1.8` wheel) and `cppcheck` for the static-analysis pass.
+
 ## Build
 
 ```sh
 make
 make test
 ```
+
+The `test` target builds and runs every test binary in `tests/` and fails on the first non-zero exit.
 
 Run locally:
 
@@ -122,6 +131,13 @@ Clean:
 
 ```sh
 make clean
+```
+
+Format the code and check formatting (requires `clang-format`):
+
+```sh
+make fmt
+make fmt-check
 ```
 
 The Makefile targets POSIX-compatible Linux/macOS environments. Windows builds are currently produced with MSYS2 GCC.
