@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install build toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential cppcheck
+
+      - name: Set up Python for clang-format
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Install pinned clang-format
+        run: pip install clang-format==22.1.8
+
+      - name: Check formatting
+        run: make fmt-check
+
+      - name: Build
+        run: make
+
+      - name: Run tests
+        run: make test
+
+      - name: Static analysis
+        run: cppcheck --enable=warning,performance,portability --std=c11 --error-exitcode=1 -Iinclude src/
