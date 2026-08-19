@@ -34,7 +34,7 @@ $(BUILD_DIR)/%: $(TEST_DIR)/%.c $(filter-out $(BUILD_DIR)/main.o,$(OBJS))
 	$(CC) $(CPPFLAGS) $(CFLAGS) $< $(filter-out $(BUILD_DIR)/main.o,$(OBJS)) $(LDFLAGS) -o $@ $(LDLIBS)
 
 test: $(TEST_BINS)
-	@for test_bin in $(TEST_BINS); do $$test_bin; done
+	@set -e; for test_bin in $(TEST_BINS); do $$test_bin; done
 
 install: $(TARGET)
 	install -d $(DESTDIR)$(BINDIR)
