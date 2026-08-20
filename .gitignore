@@ -6,6 +6,12 @@
 ROADMAP.md
 /devlogs/
 
+# Coverage artifacts
+*.gcda
+*.gcno
+*.gcov
+coverage.info
+
 # Prerequisites
 *.d
 

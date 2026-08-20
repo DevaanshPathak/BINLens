@@ -14,6 +14,9 @@ CI additionally enforces formatting (`make fmt-check`, pinned `clang-format`) an
 
 ## Test Programs
 
+- `test_cli`: CLI option parsing, defaults, malformed flags, and error diagnostics.
+- `test_diagnostic`: diagnostic clear, set, formatting, severity names, and null safety.
+- `test_format`: address formatting, human-readable size units, and null-buffer safety.
 - `test_smoke`: CLI option parsing and basic helpers.
 - `test_hex_parser`: Intel HEX records, checksums, EOF handling, and address records.
 - `test_bin_loader`: raw binary loading and base-address overflow checks.
