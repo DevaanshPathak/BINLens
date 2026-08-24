@@ -10,6 +10,7 @@ INC_DIR := include
 
 CPPFLAGS ?= -I$(INC_DIR)
 CFLAGS ?= -std=c11 -Wall -Wextra -Wpedantic -O2 -g
+COVERAGE_FLAGS ?= --coverage -fprofile-arcs -ftest-coverage
 LDFLAGS ?=
 LDLIBS ?=
 
@@ -20,7 +21,7 @@ TEST_BINS := $(patsubst $(TEST_DIR)/%.c,$(BUILD_DIR)/%,$(TEST_SRCS))
 
 FMT_FILES := $(sort $(wildcard $(SRC_DIR)/*.c) $(wildcard $(INC_DIR)/binlens/*.h) $(wildcard $(TEST_DIR)/*.c))
 
-.PHONY: all test clean install uninstall fmt fmt-check
+.PHONY: all test clean install uninstall fmt fmt-check coverage coverage-clean
 
 all: $(TARGET)
 
@@ -37,6 +38,41 @@ $(BUILD_DIR)/%: $(TEST_DIR)/%.c $(filter-out $(BUILD_DIR)/main.o,$(OBJS))
 
 test: $(TEST_BINS)
 	@set -e; for test_bin in $(TEST_BINS); do $$test_bin; done
+
+COVERAGE_BUILD_DIR := $(BUILD_DIR)/coverage
+COVERAGE_OBJS := $(patsubst $(SRC_DIR)/%.c,$(COVERAGE_BUILD_DIR)/%.o,$(SRCS))
+COVERAGE_TEST_BINS := $(patsubst $(TEST_DIR)/%.c,$(COVERAGE_BUILD_DIR)/%,$(TEST_SRCS))
+
+$(COVERAGE_BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+	@mkdir -p $(COVERAGE_BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(COVERAGE_FLAGS) -c $< -o $@
+
+$(COVERAGE_BUILD_DIR)/%: $(TEST_DIR)/%.c $(filter-out $(COVERAGE_BUILD_DIR)/main.o,$(COVERAGE_OBJS))
+	@mkdir -p $(COVERAGE_BUILD_DIR)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(COVERAGE_FLAGS) $< $(filter-out $(COVERAGE_BUILD_DIR)/main.o,$(COVERAGE_OBJS)) $(LDFLAGS) -o $@ $(LDLIBS)
+
+coverage: $(COVERAGE_TEST_BINS)
+	@set -e; \
+	minimum=60; \
+	for test_bin in $(COVERAGE_TEST_BINS); do $$test_bin; done; \
+	echo "--- Generating coverage report ---"; \
+	lcov --capture --directory $(COVERAGE_BUILD_DIR) --output-file $(COVERAGE_BUILD_DIR)/coverage.info --rc lcov_branch_coverage=1 2>/dev/null; \
+	lcov --remove $(COVERAGE_BUILD_DIR)/coverage.info '/usr/*' --output-file $(COVERAGE_BUILD_DIR)/coverage.info 2>/dev/null; \
+	line_coverage=$$(lcov --summary $(COVERAGE_BUILD_DIR)/coverage.info 2>&1 | grep -oP 'lines\.*:\s*\K[\d.]+(?=%)' | head -1); \
+	echo "Line coverage: $$line_coverage%"; \
+	if [ -z "$$line_coverage" ]; then \
+		echo "ERROR: could not determine coverage percentage"; \
+		exit 1; \
+	fi; \
+	result=$$(echo "$$line_coverage < $$minimum" | bc -l 2>/dev/null); \
+	if [ "$$result" = "1" ]; then \
+		echo "ERROR: line coverage $$line_coverage% is below minimum $$minimum%"; \
+		exit 1; \
+	fi; \
+	echo "Coverage $$line_coverage% meets threshold of $$minimum%"
+
+coverage-clean:
+	rm -rf $(COVERAGE_BUILD_DIR) $(BUILD_DIR)/*.gcda $(BUILD_DIR)/*.gcno
 
 fmt:
 	clang-format -i $(FMT_FILES)
