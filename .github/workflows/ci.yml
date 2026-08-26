@@ -5,17 +5,11 @@ on:
   pull_request:
 
 jobs:
-  build-and-test:
+  format:
     runs-on: ubuntu-latest
-
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Install build toolchain
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y --no-install-recommends build-essential cppcheck
 
       - name: Set up Python for clang-format
         uses: actions/setup-python@v5
@@ -28,11 +22,36 @@ jobs:
       - name: Check formatting
         run: make fmt-check
 
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install build toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends build-essential lcov
+
       - name: Build
         run: make
 
       - name: Run tests
         run: make test
 
+      - name: Coverage
+        run: make coverage
+
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends cppcheck
+
       - name: Static analysis
-        run: cppcheck --enable=warning,performance,portability --std=c11 --error-exitcode=1 -Iinclude src/
+        run: cppcheck --enable=warning,performance,portability --std=c11 --error-exitcode=1 -Iinclude src/ tests/
