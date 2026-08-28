@@ -5,6 +5,23 @@ Command-line firmware inspection for Intel HEX and raw binary images, focused on
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](#)
 
+## Architecture
+
+BINLens is organized into small, single-responsibility C modules under `src/`:
+
+- `main.c` — entry point and top-level error handling
+- `cli.c` — command-line option parsing and validation
+- `hex_parser.c` — Intel HEX parsing with checksum validation
+- `bin_loader.c` — raw binary loading with configurable base address
+- `firmware_image.c` — shared chunk/region/gap/overlap data model
+- `memmap.c` — address sorting, merging, gap/overlap detection
+- `entropy.c` — Shannon entropy calculation and heatmap symbols
+- `vector_table.c` — ARM Cortex-M vector table detection and scoring
+- `format.c` — human-readable address, size, and table formatting
+- `diagnostic.c` — structured error and warning messages
+
+Each module is independently testable. See [ARCHITECTURE.md](ARCHITECTURE.md) for the full data model and data flow.
+
 ## Why It Exists
 
 Firmware images are often handed around as `.hex` or `.bin` files with little context. Before flashing, comparing, or auditing one, it helps to answer:

@@ -40,6 +40,14 @@ The test workflow should stay Makefile-based:
 make test
 ```
 
+Coverage reports (requires `lcov`):
+
+```sh
+make coverage
+```
+
+The `coverage` target enforces a minimum line coverage threshold (60%) and will fail if coverage drops below that level.
+
 See [TESTING.md](TESTING.md) for the current fixture set and manual validation commands.
 
 Tests should cover:

@@ -13,11 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `make fmt` and `make fmt-check` targets backed by a checked-in `.clang-format` (LLVM base, 4-space indent, Allman function braces).
 - README "Requirements" section documenting the dependency-free toolchain.
 - This changelog.
+- `test_cli.c`: dedicated CLI tests with malformed flag, missing value, and boundary coverage.
+- `test_diagnostic.c`: unit tests for diagnostic clear, set, formatting, severity names, and null safety.
+- `test_format.c`: unit tests for address and size formatting with null-buffer safety.
+- `make coverage` target using gcov/lcov enforcing a 60% line coverage threshold.
+- Dockerfile for reproducible Ubuntu-based build and test.
 
 ### Changed
 
 - `make test` now stops at the first failing test binary instead of masking earlier failures with the last binary's exit status.
 - Applied `clang-format` across `src/`, `include/`, and `tests/` (mechanical reformat, no behavior change).
+- CI split into three parallel jobs: `format`, `build-test` (with coverage gate), and `static-analysis`.
+- `cppcheck` static analysis now also scans the `tests/` directory.
+- README now includes an Architecture section summarizing module responsibilities.
 
 ## [1.0.0] - 2026-07-07
 
