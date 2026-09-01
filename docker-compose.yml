@@ -1,0 +1,7 @@
+services:
+  binlens:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: binlens:latest
+    command: ["--help"]

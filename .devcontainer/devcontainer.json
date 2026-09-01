@@ -1,0 +1,16 @@
+{
+  "name": "BINLens",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools-extension-pack",
+        "bierner.github-markdown-preview"
+      ]
+    }
+  },
+  "postCreateCommand": "make && make test"
+}
