@@ -53,5 +53,31 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends cppcheck
 
-      - name: Static analysis
-        run: cppcheck --enable=warning,performance,portability --std=c11 --error-exitcode=1 -Iinclude src/ tests/
+      - name: Static analysis (src/)
+        run: cppcheck --enable=all --inconclusive --std=c11 --error-exitcode=1 --suppress=missingIncludeSystem -Iinclude src/
+
+      - name: Static analysis (tests/)
+        run: cppcheck --enable=all --inconclusive --std=c11 --error-exitcode=1 --suppress=missingIncludeSystem -Iinclude tests/
+
+  terraform:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.6"
+
+      - name: Terraform fmt check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform init
+        run: terraform init
+
+      - name: Terraform validate
+        run: terraform validate

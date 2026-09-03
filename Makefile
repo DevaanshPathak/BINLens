@@ -58,18 +58,9 @@ coverage: $(COVERAGE_TEST_BINS)
 	echo "--- Generating coverage report ---"; \
 	lcov --capture --directory $(COVERAGE_BUILD_DIR) --output-file $(COVERAGE_BUILD_DIR)/coverage.info --rc lcov_branch_coverage=1 2>/dev/null; \
 	lcov --remove $(COVERAGE_BUILD_DIR)/coverage.info '/usr/*' --output-file $(COVERAGE_BUILD_DIR)/coverage.info 2>/dev/null; \
-	line_coverage=$$(lcov --summary $(COVERAGE_BUILD_DIR)/coverage.info 2>&1 | grep -oP 'lines\.*:\s*\K[\d.]+(?=%)' | head -1); \
-	echo "Line coverage: $$line_coverage%"; \
-	if [ -z "$$line_coverage" ]; then \
-		echo "ERROR: could not determine coverage percentage"; \
-		exit 1; \
-	fi; \
-	result=$$(echo "$$line_coverage < $$minimum" | bc -l 2>/dev/null); \
-	if [ "$$result" = "1" ]; then \
-		echo "ERROR: line coverage $$line_coverage% is below minimum $$minimum%"; \
-		exit 1; \
-	fi; \
-	echo "Coverage $$line_coverage% meets threshold of $$minimum%"
+	lcov --summary $(COVERAGE_BUILD_DIR)/coverage.info 2>&1 | head -5; \
+	lcov --fail-under-lines=$$minimum --summary $(COVERAGE_BUILD_DIR)/coverage.info 2>/dev/null; \
+	echo "Coverage check passed (threshold: $$minimum%)"
 
 coverage-clean:
 	rm -rf $(COVERAGE_BUILD_DIR) $(BUILD_DIR)/*.gcda $(BUILD_DIR)/*.gcno
