@@ -31,7 +31,21 @@ static void set_open_error(
     }
 }
 
-/* Loads a raw binary file at the supplied base address as one contiguous firmware chunk. */
+/* Loads a raw binary file at the supplied base address as one contiguous firmware chunk.
+ *
+ * Input validation performed at this boundary:
+ * - NULL pointer check on all required arguments (path, image)
+ * - File-open failure returns a diagnostic with errno and cwd context
+ * - fseek/ftell validates the file is seekable and reports size errors
+ * - File size is checked against SIZE_MAX to prevent allocation overflow
+ * - fseek rewind is validated after determining size
+ * - Empty files are accepted but produce zero chunks (no firmware data)
+ * - malloc failure is caught and reported as out-of-memory
+ * - fread validates the exact expected byte count was read
+ * - bl_firmware_image_add_chunk validates address range overflow and
+ *   total-loaded-bytes overflow internally
+ * - All errors free the partially-loaded image and temporary buffer before
+ *   returning */
 int bl_bin_load_file(
     const char *path,
     uint64_t base_address,

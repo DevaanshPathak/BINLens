@@ -1,9 +1,9 @@
 # BINLens
 
-Command-line firmware inspection for Intel HEX and raw binary images, focused on STM32-class ARM Cortex-M firmware.
+**BINLens is a command-line firmware inspection tool** for Intel HEX and raw binary images, focused on STM32-class ARM Cortex-M firmware. It is a pure C11 CLI application — not infrastructure tooling — designed for terminals, CI pipelines, and firmware analysis workflows.
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](#)
+[![CI](https://github.com/DevaanshPathak/BINLens/actions/workflows/ci.yml/badge.svg)](https://github.com/DevaanshPathak/BINLens/actions/workflows/ci.yml)
 
 ## Architecture
 
@@ -125,12 +125,53 @@ Entropy Heatmap, chunk=8 bytes
 
 ## Build
 
+### Local build
+
 ```sh
 make
 make test
 ```
 
 The `test` target builds and runs every test binary in `tests/` and fails on the first non-zero exit.
+
+### Docker
+
+Build and test inside a container without installing any toolchain locally:
+
+```sh
+docker compose build
+docker compose run binlens --help
+```
+
+Or use the Dockerfile directly:
+
+```sh
+docker build -t binlens .
+docker run binlens
+```
+
+### Devcontainer
+
+This repository includes a `.devcontainer/devcontainer.json` for VS Code Remote — Containers. Opening the project in a devcontainer automatically installs GCC, Make, clang-format, cppcheck, and lcov, then runs `make && make test`.
+
+### Terraform
+
+A Terraform module is available under `terraform/` for deploying BINLens as a Docker container in infra-as-code workflows:
+
+```sh
+cd terraform
+terraform init
+terraform validate
+terraform plan
+```
+
+### One-command flow
+
+The quickest path from a fresh clone to a passing test suite:
+
+```sh
+docker compose build && docker compose run binlens make test
+```
 
 Run locally:
 

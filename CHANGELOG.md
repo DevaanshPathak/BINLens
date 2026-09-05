@@ -18,14 +18,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `test_format.c`: unit tests for address and size formatting with null-buffer safety.
 - `make coverage` target using gcov/lcov enforcing a 60% line coverage threshold.
 - Dockerfile for reproducible Ubuntu-based build and test.
+- `terraform/` module for deploying BINLens as a Docker container via Terraform.
+- `.devcontainer/devcontainer.json` for VS Code Remote — Containers.
+- `docker-compose.yml` for one-command build and test.
+- `ci.yml` terraform job: fmt check, init, and validate on every push.
+- Input validation boundary documentation in `src/hex_parser.c` and `src/bin_loader.c`.
 
 ### Changed
 
 - `make test` now stops at the first failing test binary instead of masking earlier failures with the last binary's exit status.
 - Applied `clang-format` across `src/`, `include/`, and `tests/` (mechanical reformat, no behavior change).
 - CI split into three parallel jobs: `format`, `build-test` (with coverage gate), and `static-analysis`.
-- `cppcheck` static analysis now also scans the `tests/` directory.
-- README now includes an Architecture section summarizing module responsibilities.
+- `cppcheck` static analysis now also scans the `tests/` directory with `--enable=all --inconclusive` flags.
+- README now includes an Architecture section, Docker/devcontainer/terraform build instructions, and clarifies CLI scope.
+- Makefile coverage target now uses `lcov --fail-under-lines` for a cleaner threshold gate.
 
 ## [1.0.0] - 2026-07-07
 

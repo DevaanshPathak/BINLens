@@ -67,7 +67,29 @@ void bl_hex_parse_stats_init(BlHexParseStats *stats)
     stats->start_linear_address = 0;
 }
 
-/* Parses an Intel HEX file into a firmware image. */
+/* Parses an Intel HEX file into a firmware image.
+ *
+ * Input validation performed at this boundary:
+ * - NULL pointer check on all required arguments (path, image, stats)
+ * - File-open failure returns a diagnostic with errno and cwd context
+ * - Line length limit enforced (BL_HEX_MAX_LINE = 1024); lines longer than
+ *   the buffer with no newline are rejected
+ * - Empty lines are silently skipped
+ * - Records after EOF are rejected
+ * - Each record must start with ':'
+ * - Minimum record length of 11 bytes enforced
+ * - Header hex fields (byte_count, address, record_type) validated via
+ *   hex_nibble(); any non-hex character produces a diagnostic
+ * - Expected length computed from byte_count and validated against actual
+ *   line length to catch truncation and extra data
+ * - Data hex bytes validated via hex_nibble() per byte
+ * - Checksum field validated as hex and compared against the two's-complement
+ *   sum of all header+data bytes
+ * - Record type switch validates type-specific constraints (byte_count,
+ *   offset_address, field presence)
+ * - ferror() check catches read errors between records
+ * - Missing EOF record at end of file is an error
+ * - All errors free the partially-built image before returning */
 int bl_hex_parse_file(const char *path,
                       BlFirmwareImage *image,
                       BlHexParseStats *stats,
